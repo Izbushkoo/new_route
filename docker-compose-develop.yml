@@ -1,0 +1,45 @@
+version: "3.8"
+services:
+  new_route:
+    container_name: 'postgres_new_route'
+    image: postgres:15
+    command: postgres -c "max_connections=10000"
+    restart: unless-stopped
+    env_file:
+      - .env
+    networks:
+      - new_route_network
+    ports:
+      - ${POSTGRES_PORT}:5432
+  pg_web:
+    container_name: 'postgres_new_route_web'
+    image: sosedoff/pgweb
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    links:
+      - new_route:postgres  # my database container is called postgres, not db
+    env_file:
+      - .env
+    environment:
+      - PGWEB_DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_SERVER}:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=disable
+    depends_on:
+      - new_route # my database container is called postgres, not db
+    networks:
+      - new_route_network
+  new_route_app:
+    build: .
+    restart: unless-stopped
+    container_name: "new_route"
+    env_file:
+      - .env
+    ports:
+      - "${APP_PORT}:8787"
+    networks:
+      - new_route_network
+    depends_on:
+      - new_route
+      - pg_web
+networks:
+  new_route_network:
+    external: false

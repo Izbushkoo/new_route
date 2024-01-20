@@ -1,0 +1,29 @@
+version: "3.8"
+services:
+  new_route:
+    container_name: 'postgres_new_route'
+    image: postgres:15
+    command: postgres -c "max_connections=10000"
+    restart: unless-stopped
+    env_file:
+      - .env
+    networks:
+      - new_route_network
+    ports:
+      - ${POSTGRES_PORT}:5432
+  new_route_app:
+    build: .
+    restart: unless-stopped
+    container_name: "new_route"
+    env_file:
+      - .env
+    ports:
+      - "${APP_PORT}:8787"
+    networks:
+      - new_route_network
+    depends_on:
+      - new_route
+      - pg_web
+networks:
+  new_route_network:
+                                   external: false
