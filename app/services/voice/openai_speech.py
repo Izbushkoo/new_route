@@ -1,12 +1,13 @@
 import asyncio
 from typing import Union, IO, Dict, Literal
 
+import openai
 from openai import AsyncOpenAI
 from openai.types.audio import Transcription
 
 from app.core.config import settings
 
-
+openai.api_key = settings.OPENAI_API_KEY
 client = AsyncOpenAI()
 
 
@@ -50,7 +51,8 @@ class VoiceHandler:
 
 
 if __name__ == "__main__":
-    res = asyncio.run(VoiceHandler.text_to_speech("Hello, how are you?"))
-
+    with open("audio.ogg", "rb") as file:
+        res = asyncio.run(VoiceHandler.speech_to_text(speech_file=file))
+    print(res.text)
 
 
