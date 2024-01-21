@@ -1,56 +1,35 @@
-from dotenv import load_dotenv
-
-load_dotenv()
-
 from langchain.agents.openai_assistant import OpenAIAssistantRunnable
-from langchain.tools import tool, Tool
-from langchain.callbacks import FinalStreamingStdOutCallbackHandler
-from langchain.agents import AgentExecutor
+
+from app.models.database_models import UserSettings
 
 
-def search_web(query: str) -> str:
-    """is used to make a web search"""
-    # await asyncio.sleep(1)
-    print("tool was used")
-    return "inspecto patronum"
+class AgentGetter:
+    @classmethod
+    def from_user_settings(cls, user_settings: UserSettings):
+        assistant = OpenAIAssistantRunnable(
+            assistant_id=user_settings.current_runnable,
+            model=user_settings.gpt_model,
+            as_agent=True
+        )
+        return assistant
+
+    @classmethod
+    def build_tools(cls):
+        ...
 
 
-tools = [
-    Tool.from_function(
-        func=search_web,
-        description="is used to make a web search",
-        name="search_web",
-    )
-]
+# tools = [
+#     Tool.from_function(
+#         func=search_web,
+#         description="is used to make a web search",
+#         name="search_web",
+#     )
+# ]
 
 # tools = [format_tool_to_openai_function(tool) for tool in tools]
 
 from langchain_core.agents import AgentFinish
 
-
-async def execute_agent(agent, tools, input, thread_id):
-    tool_map = {tool.name: tool for tool in tools}
-    input.update({"thread_id": "thread_M2gJBB1QZwgMl020n2wUNOvx"})
-    response = await agent.ainvoke(input)
-    while not isinstance(response, AgentFinish):
-        tool_outputs = []
-        for action in response:
-            print(action.tool_input)
-            tool_output = await tool_map[action.tool].ainvoke(action.tool_input)
-            print(action.tool, action.tool_input, tool_output, end="\n\n")
-            tool_outputs.append(
-                {"output": tool_output, "tool_call_id": action.tool_call_id}
-            )
-        print(action.thread_id)
-        response = await agent.ainvoke(
-            {
-                "tool_outputs": tool_outputs,
-                "run_id": action.run_id,
-                "thread_id": thread_id,
-            }
-        )
-
-    return response
 
 
 async def main():
@@ -81,5 +60,5 @@ async def main():
 # asyncio.run(main())
 from langchain.schema.messages import messages_from_dict
 
-res = openai.beta.threads.messages.list("thread_GbqfHXjcPt8x6mtczJWspbW0")
-print(res)
+# res = openai.beta.threads.messages.list("thread_GbqfHXjcPt8x6mtczJWspbW0")
+# print(res)

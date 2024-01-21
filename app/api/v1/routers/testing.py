@@ -14,17 +14,8 @@ router = APIRouter()
 
 @router.post("/test")
 async def test(
-        file: UploadFile,
         user: user_schemas.User = Depends(deps.get_current_user),
         db: AsyncSession = Depends(deps.get_db_async),
         ):
-    from pydub import AudioSegment
-    import io
 
-    f = io.BytesIO(await file.read())
-    seg = AudioSegment.from_file(f)
-    buffer = io.BytesIO()
-    seg.export(buffer, format="wav")
-
-    logging.info(f"{file.size}")
-    return file.content_type
+    return user.user_settings

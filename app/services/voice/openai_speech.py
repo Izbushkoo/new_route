@@ -7,7 +7,6 @@ from openai.types.audio import Transcription
 
 from app.core.config import settings
 
-openai.api_key = settings.OPENAI_API_KEY
 client = AsyncOpenAI()
 
 
