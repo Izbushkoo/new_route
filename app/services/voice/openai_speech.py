@@ -49,7 +49,6 @@ class VoiceHandler:
         )
 
 
-
 if __name__ == "__main__":
     res = asyncio.run(VoiceHandler.text_to_speech("Hello, how are you?"))
 

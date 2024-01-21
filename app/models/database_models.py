@@ -30,7 +30,7 @@ class UserSettings(SQLModel, table=True):
     current_message_thread: Optional[str] = Field(default=None, nullable=True)
     response_format: Optional[str] = Field(default="text")
     voice_sound: Optional[str] = Field(default="alloy")
-    audio_speed: Optional[float | int] = Field(default=0.85)
+    audio_speed: Optional[float] = Field(default=0.85)
 
 
 class MessageThread(SQLModel, table=True):
