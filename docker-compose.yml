@@ -10,7 +10,7 @@ services:
     networks:
       - new_route_network
     ports:
-      - ${POSTGRES_PORT}:5432
+      - ${POSTGRES_PORT_TO_LOCAL_HOST}:5432
   new_route_app:
     build: .
     restart: unless-stopped
@@ -19,11 +19,12 @@ services:
       - .env
     ports:
       - "${APP_PORT}:8787"
+    volumes:
+      - /additional_disk/new_route/logs:/app/logs
     networks:
       - new_route_network
     depends_on:
       - new_route
-      - pg_web
 networks:
   new_route_network:
-                                   external: false
+   external: false

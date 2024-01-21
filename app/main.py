@@ -2,13 +2,12 @@ import uvicorn
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from dotenv import load_dotenv
-load_dotenv()
-
 from app.api.v1.api import api_router as api_router_v1
 from app.core.config import settings
+from app.loggers import set_up_loggers
 
 
+set_up_loggers()
 app = FastAPI(title=settings.PROJECT_NAME,
               openapi_url=f"{settings.API_V1_STR}/openapi.json",
               docs_url=f"{settings.API_V1_STR}/docs")

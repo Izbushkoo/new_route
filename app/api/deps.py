@@ -9,7 +9,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from app.core import security
 from app.core.config import settings
 from app.database import SessionLocal, AsyncSessLocal
-from app.models.user import User as UserModel
+from app.models.database_models import User as UserModel
 from app.schemas.token import TokenPayload
 from app.services.user import get_user_by_id
 

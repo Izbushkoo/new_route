@@ -12,12 +12,14 @@ WORKDIR /app
 
 COPY pyproject.toml poetry.lock ./
 RUN touch README.md
-
-RUN poetry install --without dev --no-root && rm -rf $POETRY_CACHE_DIR
+RUN apt-get update -y
+RUN apt-get install -y ffmpeg portaudio19-dev libavcodec-extra libasound2-dev
+RUN poetry install --no-root && rm -rf $POETRY_CACHE_DIR
 
 COPY . .
+#RUN apt-get install ffmpeg portaudio19-dev libavcodec-extra libasound2-dev
 
-RUN poetry install --without dev
+RUN poetry install
 
 EXPOSE 8787
 

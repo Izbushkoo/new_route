@@ -45,3 +45,5 @@ If you want to preserve (store) this environment variable between shell sessions
 
     echo 'export PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring' >> ~/.profile  exec "$SHELL"
 
+
+

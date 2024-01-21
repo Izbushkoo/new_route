@@ -10,7 +10,7 @@ services:
     networks:
       - new_route_network
     ports:
-      - ${POSTGRES_PORT}:5432
+      - ${POSTGRES_PORT_TO_LOCAL_HOST}:5432
   pg_web:
     container_name: 'postgres_new_route_web'
     image: sosedoff/pgweb
@@ -22,7 +22,7 @@ services:
     env_file:
       - .env
     environment:
-      - PGWEB_DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_SERVER}:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=disable
+      - PGWEB_DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_SERVER}:5432/${POSTGRES_DB}?sslmode=disable
     depends_on:
       - new_route # my database container is called postgres, not db
     networks:
@@ -35,6 +35,8 @@ services:
       - .env
     ports:
       - "${APP_PORT}:8787"
+    volumes:
+      - /home/izbushko/projects/new_route/logs:/app/logs
     networks:
       - new_route_network
     depends_on:
