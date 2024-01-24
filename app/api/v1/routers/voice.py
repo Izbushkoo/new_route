@@ -27,6 +27,7 @@ async def upload_audio_file(file: UploadFile,
                 speech_file=io.BytesIO(await file.read()),
             )
             # todo write logic
+
         raise HTTPException(status_code=422, detail="File size is more than 25MB.")
     raise HTTPException(status_code=422, detail=f"Unsupported MIME-TYPE {file.content_type}")
 

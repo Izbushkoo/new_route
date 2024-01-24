@@ -1,16 +1,16 @@
 import asyncio
-from typing import Union, IO, Dict, Literal
+from typing import Union, IO, Dict
 
-import openai
 from openai import AsyncOpenAI
-from openai.types.audio import Transcription
+from openai import OpenAIError
 
-from app.core.config import settings
+from app.models.database_models import VoiceSound
+
 
 client = AsyncOpenAI()
 
 
-class VoiceHandlerException(Exception):
+class VoiceHandlerException(OpenAIError):
     pass
 
 
@@ -25,33 +25,36 @@ class VoiceHandler:
 
     @classmethod
     async def speech_to_text(cls, speech_file: IO[bytes], model: str = "whisper-1", prompt: str = None
-                             ) -> Transcription:
-
-        return await client.audio.transcriptions.create(
-            model=model,
-            file=speech_file,
-            prompt=prompt
-        )
+                             ) -> str:
+        try:
+            result = await client.audio.transcriptions.create(
+                model=model,
+                file=speech_file,
+                prompt=prompt
+            )
+        except OpenAIError as e:
+            raise VoiceHandlerException(f"Error encountered while getting speech transcription\n originate from {e}")
+        else:
+            return result.text
 
     @classmethod
     async def text_to_speech(cls, text: str,
                              model: str = "tts-1",
                              speed: int | float = 0.85,
-                             response_format: Literal["mp3", "opus", "aac", "flac"] = "opus",
-                             voice: Literal["alloy", "echo", "fable", "onyx", "nova", "shimmer"] = "alloy"
-                             ):
-        return await client.audio.speech.create(
-            input=text,
-            speed=speed,
-            model=model,
-            response_format=response_format,
-            voice=voice
-        )
-
-
-if __name__ == "__main__":
-    with open("audio.ogg", "rb") as file:
-        res = asyncio.run(VoiceHandler.speech_to_text(speech_file=file))
-    print(res.text)
+                             response_format: str = "opus",
+                             voice: VoiceSound | str = "alloy"
+                             ) -> bytes:
+        try:
+            result = await client.audio.speech.create(
+                input=text,
+                speed=speed,
+                model=model,
+                response_format=response_format,
+                voice=voice
+            )
+        except OpenAIError as e:
+            raise VoiceHandlerException(f"Error encountered while getting speech transcription\n originate from {e}")
+        else:
+            return result.read()
 
 

@@ -27,6 +27,7 @@ simpleaudio = "^1.0.4"
 pyaudio = "^0.2.14"
 sounddevice = "^0.4.6"
 soundfile = "^0.12.1"
+websockets = "^12.0"
 
 
 [tool.poetry.group.dev.dependencies]

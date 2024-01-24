@@ -1,16 +1,16 @@
-import logging
-from typing import Dict
+import base64
+from typing import Dict, IO
 
-from fastapi import UploadFile
-
+from langchain.agents.openai_assistant import OpenAIAssistantRunnable
 from sqlmodel.ext.asyncio.session import AsyncSession
 from langchain.agents import AgentExecutor
 
 from app.schemas.user import UserInDBBase
 from app.schemas.requests_responses import ResponseBody, Thread
 from app.models.database_models import UserSettings
-from app.services.assistant.agent import AgentGetter
 from app.services.threads import create_message_thread
+from app.services.voice.openai_speech import VoiceHandler
+from app.services.assistant.tools import available_tools
 
 
 class BaseProcessor:
@@ -18,8 +18,8 @@ class BaseProcessor:
     def __init__(self, request: str, database: AsyncSession, user: UserInDBBase):
         self.request_text = request
         self.database = database
-        self.user = user
-        self.user_settings = user.user_settings
+        self.user: UserInDBBase = user
+        self.user_settings: UserSettings = user.user_settings
 
     async def get_response(self) -> ResponseBody:
         """Overwrite by child"""
@@ -38,33 +38,43 @@ class AssistantProcessor(BaseProcessor):
                 user_id=self.user.id
             )
             thread_id = new_thread.thread_id
-        agent = self.get_assistant_agent(user_settings=self.user_settings)
-        tools = self.prepare_tools(user_settings=self.user_settings)
+
+        agent = self.__get_assistant_agent_from_settings()
+        tools = self.__prepare_tools()
         executor = self.get_executor(agent=agent, tools=tools)
+
         inputs = {"content": self.request_text, "thread_id": thread_id}
         result = await executor.ainvoke(input=inputs)
+
         return await self._prepare_response(invoke_result=result)
 
     async def _prepare_response(self, invoke_result: Dict) -> ResponseBody:
+        response_text = invoke_result["output"]
         body = ResponseBody(
-            text=invoke_result["output"]
+            text=response_text
         )
         if self.user_settings.voice_answer:
-            # todo write voice
-            await ...
-            body.audio = ...
+            voice = await VoiceHandler.text_to_speech(
+                text=response_text,
+                speed=self.user_settings.audio_speed,
+                voice=self.user_settings.voice_sound
+            )
+            body.audio = base64.b64encode(voice)
         return body
 
-    @classmethod
-    def prepare_tools(cls, user_settings: UserSettings):
-        return []
+    def __prepare_tools(self):
+        return [available_tools[tool.name] for tool in self.user_settings.tools]
+
+    def __get_assistant_agent_from_settings(self):
+        assistant = OpenAIAssistantRunnable(
+            assistant_id=self.user_settings.current_assistant,
+            model=self.user_settings.gpt_model,
+            as_agent=True
+        )
+        return assistant
 
     @classmethod
-    def get_assistant_agent(cls, user_settings: UserSettings):
-        return AgentGetter.from_user_settings(user_settings=user_settings)
-
-    @classmethod
-    def get_executor(cls, agent, *args, **kwargs):
+    def get_executor(cls, agent, **kwargs):
         return AgentExecutor(agent=agent, **kwargs)
 
 
@@ -75,7 +85,3 @@ class RunnableProcessor(BaseProcessor):
 
 
 
-if __name__ == "__main__":
-    pr = AssistantProcessor(
-
-    )

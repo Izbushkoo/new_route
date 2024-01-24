@@ -1,21 +1,8 @@
+from typing import List
+
 from langchain.agents.openai_assistant import OpenAIAssistantRunnable
 
 from app.models.database_models import UserSettings
-
-
-class AgentGetter:
-    @classmethod
-    def from_user_settings(cls, user_settings: UserSettings):
-        assistant = OpenAIAssistantRunnable(
-            assistant_id=user_settings.current_runnable,
-            model=user_settings.gpt_model,
-            as_agent=True
-        )
-        return assistant
-
-    @classmethod
-    def build_tools(cls):
-        ...
 
 
 # tools = [
