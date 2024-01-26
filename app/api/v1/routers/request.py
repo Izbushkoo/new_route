@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from typing import Any, List, Optional
 
@@ -9,6 +10,7 @@ from app.api import deps
 from app.schemas import user as user_schemas
 from app.schemas.requests_responses import RequestBody, ResponseBody
 from app.services.request_processor import AssistantProcessor
+from app.services.wsocket.websocket import SocketProcessor
 
 
 router = APIRouter()
@@ -28,7 +30,7 @@ html = """
         <ul id='messages'>
         </ul>
         <script>
-            var ws = new WebSocket("ws://localhost:8909/new_route/api/v1/text/");
+            var ws = new WebSocket("ws://localhost:8909/new_route/api/v1/text/socket_request");
             ws.onmessage = function(event) {
                 var messages = document.getElementById('messages')
                 var message = document.createElement('li')
@@ -42,8 +44,7 @@ html = """
                 input.value = ''
                 event.preventDefault()
             }
-        </script>
-    </body>
+        </script> </body>
 </html>
 """
 
@@ -69,12 +70,20 @@ async def get():
 
 
 @router.websocket("/socket_request")
-async def set_socket_connection(socket: WebSocket, user: user_schemas.UserInDBBase = Depends(deps.get_current_user)):
-    await socket.accept()
-    while True:
-        data = await socket.receive_json()
-        logging.info(f"{data}")
-        await socket.send_text("hello")
+async def set_socket_connection(
+        websocket: WebSocket,
+        # user: user_schemas.UserInDBBase = Depends(deps.get_current_user)
+):
+    await websocket.accept()
+    # stop_event = asyncio.Event()
+    processor = SocketProcessor(
+        websocket=websocket,
+        # stop=stop_event,
+        # user=user
+    )
+    await processor.process_connection()
+
+
 
 
 

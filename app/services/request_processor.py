@@ -11,6 +11,7 @@ from app.models.database_models import UserSettings
 from app.services.threads import create_message_thread
 from app.services.voice.openai_speech import VoiceHandler
 from app.services.assistant.tools import available_tools
+from app.services.text_formatters import CodeExtractor
 
 
 class BaseProcessor:
@@ -49,21 +50,28 @@ class AssistantProcessor(BaseProcessor):
         return await self._prepare_response(invoke_result=result)
 
     async def _prepare_response(self, invoke_result: Dict) -> ResponseBody:
+
         response_text = invoke_result["output"]
-        body = ResponseBody(
-            text=response_text
-        )
+
         if self.user_settings.voice_answer:
+            text, code_blocks = CodeExtractor.extract(response_text)
             voice = await VoiceHandler.text_to_speech(
-                text=response_text,
+                text=text,
                 speed=self.user_settings.audio_speed,
                 voice=self.user_settings.voice_sound
             )
-            body.audio = base64.b64encode(voice)
-        return body
+            body = ResponseBody(
+                text=text,
+                code_blocks=code_blocks,
+                audio=base64.b64encode(voice)
+            )
+            return body
+
+        return ResponseBody(text=response_text)
 
     def __prepare_tools(self):
-        return [available_tools[tool.name] for tool in self.user_settings.tools]
+        tools = [available_tools.get(tool.name) for tool in self.user_settings.tools]
+        return tools if any(tools) else []
 
     def __get_assistant_agent_from_settings(self):
         assistant = OpenAIAssistantRunnable(
