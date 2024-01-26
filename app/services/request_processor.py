@@ -62,8 +62,8 @@ class AssistantProcessor(BaseProcessor):
             )
             body = ResponseBody(
                 text=text,
-                code_blocks=code_blocks,
-                audio=base64.b64encode(voice)
+                audio=base64.b64encode(voice),
+                code_blocks=code_blocks
             )
             return body
 
