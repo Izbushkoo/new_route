@@ -43,7 +43,7 @@ class UserSettings(SQLModel, table=True):
     # Audio settings
     voice_answer: bool = Field(default=False)
     voice_sound: Optional[VoiceSound] = Field(default="alloy")
-    audio_speed: Optional[float] = Field(default=0.85)
+    audio_speed: Optional[float] = Field(default=0.85)  # From 0.25 to 4.0
 
     # Assistant settings
     current_assistant: Optional[str] = Field(default="asst_SziteqdkuV6ghYQNlmTSeeAy")

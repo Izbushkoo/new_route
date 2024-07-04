@@ -1,5 +1,5 @@
 import base64
-from typing import Dict, IO
+from typing import Dict
 
 from langchain.agents.openai_assistant import OpenAIAssistantRunnable
 from sqlmodel.ext.asyncio.session import AsyncSession

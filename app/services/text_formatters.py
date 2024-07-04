@@ -42,26 +42,26 @@ class CodeExtractor:
         return text
 
 
-test_str = """
-```python 
-asdfl
-asdfas
-```
-
-asdfjkdsahfjlkashcxv,xv
-xzcvadbhvglkb
-xzcvm,.cxbvb
-
-```python 
-def main():
-    print("hello")
-````    
-
-here is finish
-"""
-
-res = CodeExtractor.extract(text=test_str)
-
-print(res)
-
+# test_str = """
+# ```python
+# asdfl
+# asdfas
+# ```
+#
+# asdfjkdsahfjlkashcxv,xv
+# xzcvadbhvglkb
+# xzcvm,.cxbvb
+#
+# ```python
+# def main():
+#     print("hello")
+# ````
+#
+# here is finish
+# """
+#
+# res = CodeExtractor.extract(text=test_str)
+#
+# print(res)
+#
 

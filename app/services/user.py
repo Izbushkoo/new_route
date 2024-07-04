@@ -21,7 +21,7 @@ async def authenticate(db: AsyncSession, email: str, password: str) -> Optional[
 async def get_user_by_id(db: AsyncSession, user_id: int) -> user_schemas.User:
     async with db as session:
         statement = select(database_models.User).options(
-            selectinload(database_models.User.user_settings),
+            selectinload(database_models.User.user_settings).selectinload(database_models.UserSettings.tools),
             selectinload(database_models.User.message_threads)
         ).where(database_models.User.id == user_id)
         res = await session.exec(statement=statement)

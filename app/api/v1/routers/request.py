@@ -55,6 +55,7 @@ async def send_text_request(body: RequestBody,
                             user: user_schemas.UserInDBBase = Depends(deps.get_current_user)
                             ):
 
+    logging.info(f"{user.user_settings}")
     processor = AssistantProcessor(
         request=body.message,
         user=user,

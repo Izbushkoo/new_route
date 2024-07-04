@@ -20,7 +20,7 @@ services:
     ports:
       - "${APP_PORT}:8787"
     volumes:
-      - /additional_disk/new_route/logs:/app/logs
+      - /projects/new_route/app/logs:/app/logs
     networks:
       - new_route_network
     depends_on:

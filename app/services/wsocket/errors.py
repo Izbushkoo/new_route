@@ -9,17 +9,17 @@ class BaseError(BaseModel):
 
 
 class BadRequestModel(BaseError):
-    code = 422
-    details = "Bad request data were received. "
+    code: int = 422
+    details: str = "Bad request data were received. "
 
 
 class TaskRunning(BaseError):
-    code = 423
-    details = "There is runnig task already. Only stop event is acceptable."
+    code: int = 423
+    details: str = "There is runnig task already. Only stop event is acceptable."
 
 
 class TaskAborted(BaseError):
-    code = 200
-    details = "Task were successful aborted."
+    code: int = 200
+    details: str = "Task were successful aborted."
 
 

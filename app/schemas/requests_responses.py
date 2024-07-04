@@ -26,3 +26,8 @@ class ThreadUpdate(BaseModel):
     name: Optional[str]
 
 
+class UpdateConfig(BaseModel):
+    user_id: int
+    name: str
+    value: str | bool | None | float
+
